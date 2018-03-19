@@ -8,38 +8,44 @@ from parsers.scholar import scholar
 from parsers.socionet import socionet
 
 
-timestamp_dir = datetime.now().strftime('%Y-%m-%d-%H-%M')
-base_dir = 'data' + '/' + timestamp_dir + '/' + 'documents'
-if not os.path.exists(base_dir):
-    os.makedirs(base_dir)
-
-
-def main():
-    p1 = Process(target=cyberleninka, args=(base_dir,))
-    p2 = Process(target=scholar, args=(base_dir,))
-    p3 = Process(target=socionet, args=(base_dir,))
-    for p in (p1, p2, p3):
-        p.start()
-        p.join()
+def main(author, title, keywords, year1, year2):
+    timestamp_dir = datetime.now().strftime('%Y-%m-%d-%H-%M')
+    base_dir = 'data' + '/' + timestamp_dir + '/' + 'documents'
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir)
+    time_start = time.time()
+    p1 = Process(target=cyberleninka, args=(base_dir, author, title, keywords, year1, year2))
+    p2 = Process(target=scholar, args=(base_dir, author, title, keywords, year1, year2))
+    p3 = Process(target=socionet, args=(base_dir, author, title, keywords, year1, year2))
+    p1.start()
+    p2.start()
+    p3.start()
+    p1.join()
+    p2.join()
+    p3.join()
     for file in os.listdir(base_dir):
         file_name = base_dir + '/' + file
-        if os.stat(file_name).st_size == 0:
+        if os.stat(file_name).st_size < 5:
             os.remove(file_name)
-    log_data = {
-        'Дата запроса: ': timestamp_dir,
-        'Файлов загружено: ': len(os.listdir(base_dir)),
+    time_end = time.time()
+    with open('data/log.txt', 'a', encoding='utf-8') as log:
+        log.write('Дата запроса: ' + timestamp_dir + '\n')
+        log.write('Файлов загружено: ' + str(len(os.listdir(base_dir))) + '\n')
+        log.write('Время затраченное: ' + str(time_end - time_start) + '\n')
+        log.write('-Автор: ' + author + '\n')
+        log.write('-Название работы: ' + title + '\n')
+        log.write('-Ключевые слова: ' + keywords + '\n')
+        log.write('-Дата: ' + year1 + ' - ' + year2 + '\n')
+        log.write('='*30 + '\n')
 
-
-    }
-    with open('data/log.txt', 'w', encoding='utf-8') as log:
-        log.write(log_data)
 
 def test():
-    time_start = time.time()
-    base_dir = 'data/2018-03-15-18-27/documents'
-    time.sleep(5)
-    time_end = time.time()
-    print(time_end - time_start)
+    author = 'Черненький М.В.'
+    title = ''
+    keywords = ''
+    year1 = ''
+    year2 = ''
+    main(author, title, keywords, year1, year2)
 
 
 if __name__ == '__main__':
