@@ -1,7 +1,8 @@
-import os, sys
+import os
 from datetime import datetime
 from multiprocessing import Process
 import time
+
 
 from parsers.cyberleninka import cyberleninka
 from parsers.scholar import scholar
@@ -40,14 +41,13 @@ def main(author, title, keywords, year1, year2):
 
 
 def test():
-    author = 'Черненький М.В.'
+    author = 'Черненький М. В.'
     title = ''
-    keywords = ''
+    keywords = 'метод'
     year1 = ''
     year2 = ''
     main(author, title, keywords, year1, year2)
 
 
 if __name__ == '__main__':
-    #main()
     test()

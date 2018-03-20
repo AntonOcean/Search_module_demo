@@ -1,10 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 from time import sleep
-import os, sys
+import os
+import sys
 
 
-base_dir = None
+base_dir = 'test'
 base_url = 'https://scholar.google.ru/scholar'
 
 
@@ -22,13 +23,11 @@ def get_urls(html):
             continue
     return name_urls
 
+
 def download_file(name, url):
     sleep(1)
     try:
         r = requests.get(url, stream=True)
-        # except:
-        #     print('Scholar:', name, 'is not download')
-        #     return 0
         postfix = url.split('.')[-1]
         if '#' in postfix:
             return 0
@@ -46,10 +45,11 @@ def download_file(name, url):
     except:
         print('Scholar: ошибка загрузки')
 
-def scholar(b_dir, author='', title='', keywords='', year1='', year2=''):
+
+def scholar(b_dir='test', author='', title='', keywords='', year1='', year2=''):
     global base_dir
-    base_dir= b_dir
-    #sys.stdout = open('/'.join(base_dir.split('/')[:2]) + '/' + 'log_scholar.txt', 'a', encoding='utf-8')
+    base_dir = b_dir
+    sys.stdout = open('/'.join(base_dir.split('/')[:2]) + '/' + 'log_scholar.txt', 'a', encoding='utf-8')
     print('Scholar: начал работу')
     query = {
         'allintitle': '"' + title + '"',
@@ -58,8 +58,8 @@ def scholar(b_dir, author='', title='', keywords='', year1='', year2=''):
     params = {
         'q': keywords + ' ' + ' '.join([k+':'+v for k, v in query.items() if v[1:-1]]),
         'as_vis': 1,   # без цитат
-        'as_ylo': year1, # год 1
-        'as_yhi': year2, # год 2
+        'as_ylo': year1,  # год 1
+        'as_yhi': year2,  # год 2
         'hl': 'ru',
         'start': 0,  # страницы 10 20 ...80
     }
@@ -70,16 +70,17 @@ def scholar(b_dir, author='', title='', keywords='', year1='', year2=''):
         except:
             print('Scholar: проверьте соединение с сетью')
             break
-        print('Socholar: запрос:', r.url)
+        print('Scholar: запрос:', r.url)
         html = r.text
         name_urls = get_urls(html)
         if name_urls:
             for name, url in name_urls:
                 download_file(name, url)
         else:
-            print('Scholar: загрузка завершена')
+            print('Scholar: работа завершена')
             break
         params['start'] += 10
 
+
 if __name__ == '__main__':
-    scholar('test')
+    scholar()

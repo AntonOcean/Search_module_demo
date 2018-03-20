@@ -1,21 +1,39 @@
 import requests
 from bs4 import BeautifulSoup
 from time import sleep
-import os, sys
+import os
+import sys
 # https://socionet.ru/find.html
 
 
-base_dir = None
+base_dir = 'test'
 base_url = 'https://socionet.ru/search/runsearch.cgi'
 
 
-def get_urls(html):
+def author_and_title_problem(author, title, element):
+    head = element.text.strip()
+    author = author.split()
+    author1 = author[0] + ' ' + author[1] + ' ' + author[2]
+    author2 = author[0] + ' ' + author[1] + author[2]
+    author3 = author[1] + author[2] + ' ' + author[0]
+    author4 = author[1] + ' ' + author[2] + ' ' + author[0]
+    if ((author1 == author1 in head)
+        or (author2 == author2 in head)
+        or (author3 == author3 in head)
+        or (author4 == author4 in head))\
+            and (title.lower() == title.lower() in head.lower()):
+        return True
+    return False
+
+
+def get_urls(html, author='', title=''):
     urls = []
     soup = BeautifulSoup(html, 'lxml')
     tags = soup.find_all('a')
     for tag in tags:
-        url = tag.get('href')
-        urls.append(url)
+        if author_and_title_problem(author, title, tag):
+            url = tag.get('href')
+            urls.append(url)
     result_urls = []
     for url in urls:
         if 'cyberleninka' not in url:
@@ -53,17 +71,17 @@ def download_file(name, url):
         print('Socionet: ошибка загрузки')
 
 
-def socionet(b_dir, author='', title='', keywords='', year1='', year2=''):
+def socionet(b_dir='test', author='', title='', keywords='', year1='', year2=''):
     global base_dir
-    base_dir= b_dir
-    #sys.stdout = open('/'.join(base_dir.split('/')[:2]) + '/' + 'log_socionet.txt', 'a', encoding='utf-8')
+    base_dir = b_dir
+    sys.stdout = open('/'.join(base_dir.split('/')[:2]) + '/' + 'log_socionet.txt', 'a', encoding='utf-8')
     print('Socionet: начал работу')
     if title:
-        return 0
+        keywords = title + ' ' + keywords
     try:
         r = requests.post(base_url, data={
             'author-name': author,
-            'justtext': keywords, # ключевые слова
+            'justtext': keywords,  # ключевые слова
             'fulltext': 'fulltext',  # fulltext
             'tr1': year1,
             'tr2': year2,      # 14 марта 1971
@@ -74,14 +92,14 @@ def socionet(b_dir, author='', title='', keywords='', year1='', year2=''):
         print('Socionet: проверьте соединение с сетью')
         return 0
     html = r.text
-    names_urls = get_urls(html)
+    names_urls = get_urls(html, author, title)
     if names_urls:
         for name, url in names_urls:
             download_file(name, url)
-        print('Socionet: загрузка завершена')
+        print('Socionet: работа завершена')
     else:
-        print('Socionet: проверьте доступность запрашиваемых материалов')
+        print('Socionet: материалы не найдены')
 
 
 if __name__ == '__main__':
-    socionet('data')
+    socionet(author='Жуков В. Т.', title='метод', year1='2011', year2='2012')

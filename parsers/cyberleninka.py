@@ -1,10 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 from time import sleep
-import os, sys
+import os
+import sys
 
 
-base_dir = None
+base_dir = 'test'
 base_url = 'https://cyberleninka.ru'
 
 
@@ -17,14 +18,30 @@ def count_pages(html):
     return pages
 
 
-def get_urls(html):
+def author_problem(author, element):
+    head_author = element.find_next('span').text.strip()
+    author = author.split()
+    author1 = author[0] + ' ' + author[1] + ' ' + author[2]
+    author2 = author[0] + ' ' + author[1] + author[2]
+    author3 = author[1] + author[2] + ' ' + author[0]
+    author4 = author[1] + ' ' + author[2] + ' ' + author[0]
+    if (author1 == author1 in head_author)\
+            or (author2 == author2 in head_author)\
+            or (author3 == author3 in head_author)\
+            or (author4 == author4 in head_author):
+        return True
+    return False
+
+
+def get_urls(html, author=''):
     name_urls = []
     soup = BeautifulSoup(html, 'lxml')
     articles = soup.find_all('h2', class_='title')
     for article in articles:
-        url = base_url + article.find('a').get('href') + '.pdf'
-        name = article.find('a').text.strip()
-        name_urls.append((name, url))
+        if author_problem(author, article):
+            url = base_url + article.find('a').get('href') + '.pdf'
+            name = article.find('a').text.strip()
+            name_urls.append((name, url))
     return name_urls
 
 
@@ -45,25 +62,26 @@ def download_file(name, url):
     except:
         print('Cyberleninka: ошибка загрузки')
 
-def get_data_fom_page(html):
-    names_urls = get_urls(html)
+
+def get_data_fom_page(html, author=''):
+    names_urls = get_urls(html, author)
     if names_urls:
         for name, url in names_urls:
             download_file(name, url)
     else:
-        print('Cyberleninka: проверьте доступность запрашиваемых материалов')
+        print('Cyberleninka: материалы не найдены')
 
 
-def cyberleninka(b_dir, author='', title='', keywords='', year1='', year2=''):
+def cyberleninka(b_dir='test', author='', title='', keywords='', year1='', year2=''):
     global base_dir
     base_dir = b_dir
-    #sys.stdout = open('/'.join(base_dir.split('/')[:2]) + '/' + 'log_cyberleninka.txt', 'a', encoding='utf-8')
+    sys.stdout = open('/'.join(base_dir.split('/')[:2]) + '/' + 'log_cyberleninka.txt', 'a', encoding='utf-8')
     print('Cyberleninka: начал работу')
     query = {
         '@author': author,
-        '@name': title, # название статьи
-        '@keywords': keywords, # ключевые слова
-        '@year': year1,  # поиск по году точный
+        '@name': title,  # название статьи
+        '@keywords': keywords,  # ключевые слова
+        '@year': year1 or year2,  # поиск по году точный
     }
     params = {
         'q': ' '.join([k+' '+v for k, v in query.items() if v]),
@@ -78,14 +96,13 @@ def cyberleninka(b_dir, author='', title='', keywords='', year1='', year2=''):
         return 0
     pages = count_pages(html)
     if pages:
-        get_data_fom_page(html)
+        get_data_fom_page(html, author)
         for i in range(2, pages+1):
             params['page'] = i
             html = requests.get(base_url+'/search', params=params).text
             get_data_fom_page(html)
-        print('Cyberleninka: загрузка завершена')
-
+        print('Cyberleninka: работа завершена')
 
 
 if __name__ == '__main__':
-    cyberleninka('test')
+    cyberleninka(author='Черненький В. М.', title='система')
