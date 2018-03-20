@@ -7,11 +7,13 @@ import time
 from parsers.cyberleninka import cyberleninka
 from parsers.scholar import scholar
 from parsers.socionet import socionet
+#  from config import *
 
 
 def main(author, title, keywords, year1, year2):
     timestamp_dir = datetime.now().strftime('%Y-%m-%d-%H-%M')
-    base_dir = 'data' + '/' + timestamp_dir + '/' + 'documents'
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    base_dir = base_dir + '/data/' + timestamp_dir + '/' + 'documents'
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
     time_start = time.time()
@@ -29,7 +31,7 @@ def main(author, title, keywords, year1, year2):
         if os.stat(file_name).st_size < 5:
             os.remove(file_name)
     time_end = time.time()
-    with open('data/log.txt', 'a', encoding='utf-8') as log:
+    with open('/'.join(base_dir.split('/')[:2]) + '/log.txt', 'a', encoding='utf-8') as log:
         log.write('Дата запроса: ' + timestamp_dir + '\n')
         log.write('Файлов загружено: ' + str(len(os.listdir(base_dir))) + '\n')
         log.write('Время затраченное: ' + str(time_end - time_start) + '\n')

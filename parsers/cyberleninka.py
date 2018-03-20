@@ -20,16 +20,20 @@ def count_pages(html):
 
 def author_problem(author, element):
     head_author = element.find_next('span').text.strip()
-    author = author.split()
-    author1 = author[0] + ' ' + author[1] + ' ' + author[2]
-    author2 = author[0] + ' ' + author[1] + author[2]
-    author3 = author[1] + author[2] + ' ' + author[0]
-    author4 = author[1] + ' ' + author[2] + ' ' + author[0]
-    if (author1 == author1 in head_author)\
-            or (author2 == author2 in head_author)\
-            or (author3 == author3 in head_author)\
-            or (author4 == author4 in head_author):
-        return True
+    try:
+        author_list = author.split()
+        author1 = author_list[0] + ' ' + author_list[1] + ' ' + author_list[2]
+        author2 = author_list[0] + ' ' + author_list[1] + author_list[2]
+        author3 = author_list[1] + author_list[2] + ' ' + author_list[0]
+        author4 = author_list[1] + ' ' + author_list[2] + ' ' + author_list[0]
+        if (author1 == author1 in head_author)\
+                or (author2 == author2 in head_author)\
+                or (author3 == author3 in head_author)\
+                or (author4 == author4 in head_author):
+            return True
+    except IndexError:
+        if author == author in head_author:
+            return True
     return False
 
 
@@ -75,7 +79,7 @@ def get_data_fom_page(html, author=''):
 def cyberleninka(b_dir='test', author='', title='', keywords='', year1='', year2=''):
     global base_dir
     base_dir = b_dir
-    sys.stdout = open('/'.join(base_dir.split('/')[:2]) + '/' + 'log_cyberleninka.txt', 'a', encoding='utf-8')
+    sys.stdout = open('/'.join(base_dir.split('/')[:3]) + '/' + 'log_cyberleninka.txt', 'a', encoding='utf-8')
     print('Cyberleninka: начал работу')
     query = {
         '@author': author,
