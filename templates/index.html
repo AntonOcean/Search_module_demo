@@ -3,35 +3,55 @@
 
 {% block content %}
 
-<form action="{{ url_for('index') }}" method="POST">
+    <div class="col-6 mx-auto" id="form_query">
+        <form action="{{ url_for('index') }}" method="POST">
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="exampleInputAuthor">Автор</label>
+                        <input type="text" class="form-control" id="exampleInputAuthor" placeholder="Иванов И. И." name="author"
+                               aria-describedby="Author" value="">
+                        <small id="Author">Автор только один</small>
+                    </div>
 
-    <div class="form-group">
-        <label for="exampleInputAuthor">Автор</label>
-        <input type="text" class="form-control" id="exampleInputAuthor" placeholder="Имя" name="author" value="{{ request.form.get('author', '') }}">
+                    <div class="form-group">
+                        <label for="exampleInputTitle">Название статьи</label>
+                        <input type="text" class="form-control" id="exampleInputTitle" placeholder="Автоматизированные системы" name="title"
+                               aria-describedby="Title"
+                               value="">
+                        <small id="Title"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="exampleInputKeyWords">Ключевые слова</label>
+                        <input type="text" class="form-control" id="exampleInputKeyWords" placeholder="кибернетика тестирование" name="keywords"
+                               aria-describedby="Keywords"
+                               value="">
+                        <small id="Keywords">Ключевые слова через пробел</small>
+                    </div>
+                    <div>
+                        <label for="exampleInputYear1">Показать статьи, датированные следующим <b>периодом</b>:</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+
+                <div class="col-5 col-xs-12">
+                    <div class="form-group">
+                        <input name="year1" class="form-control" value="" id="exampleInputYear1" placeholder="2017" maxlength="4" pattern="[0-9]*" type="text">
+                    </div>
+                </div>
+                <span class="col-2 col-xs-12 text-center"> — </span>
+                <div  class="col-5 col-xs-12">
+                    <div class="form-group">
+                        <input name="year2" class="form-control" value="" id="xampleInputYear2" placeholder="2018" maxlength="4" pattern="[0-9]*" type="text">
+                    </div>
+                </div>
+
+            </div>
+            <button type="submit" class="btn btn-lg btn-block btn-primary" >Найти</button>
+
+        </form>
     </div>
-
-    <div class="form-group">
-        <label for="exampleInputTitle">Название статьи</label>
-        <input type="text" class="form-control" id="exampleInputTitle" placeholder="Название" name="title" value="{{ request.form.get('title', '') }}">
-    </div>
-
-    <div class="form-group">
-        <label for="exampleInputKeyWords">Ключевые слова</label>
-        <input type="text" class="form-control" id="exampleInputKeyWords" placeholder="Ключевые слова" name="keywords" value="{{ request.form.get('keywords', '') }}">
-    </div>
-
-    <div class="form-group">
-        <label for="exampleInputYear1">Год1</label>
-        <input type="text" class="form-control" id="exampleInputYear1" placeholder="Год1" name="year1" value="{{ request.form.get('year1', '') }}">
-    </div>
-
-    <div class="form-group">
-        <label for="exampleInputYear2">Год2</label>
-        <input type="text" class="form-control" id="exampleInputYear2" placeholder="Год2" name="year2" value="{{ request.form.get('year2', '') }}">
-    </div>
-
-    <button type="submit" class="btn btn-primary">Найти</button>
-
-</form>
 
 {% endblock %}
